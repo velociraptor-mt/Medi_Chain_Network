@@ -2,25 +2,25 @@
 
 
 ## Enter the network directory
-cd Medi_Chain/network
+```cd Medi_Chain/network```
 
 
 ## Generate the artifacts and crypto materials
-../tools/cryptogen generate --config=./crypto-config.yaml
+```../tools/cryptogen generate --config=./crypto-config.yaml```
 
 
 ## Create the orderer genesis block
-export FABRIC_CFG_PATH=$PWD
+```export FABRIC_CFG_PATH=$PWD```
 ### (Solo Ordering Service)
-../tools/configtxgen -profile FiveOrgsOrdererGenesis -channelID byfn-sys-channel -outputBlock ./channel-artifacts/genesis.block
+```../tools/configtxgen -profile FiveOrgsOrdererGenesis -channelID byfn-sys-channel -outputBlock ./channel-artifacts/genesis.block```
 ### Create the orderer genesis block (Raft Ordering Service)
-../tools/configtxgen -profile SampleMultiNodeEtcdRaft -channelID byfn-sys-channel -outputBlock ./channel-artifacts/genesis.block
+```../tools/configtxgen -profile SampleMultiNodeEtcdRaft -channelID byfn-sys-channel -outputBlock ./channel-artifacts/genesis.block```
 ### Create the orderer genesis block (Kafka Ordering Service)
-../tools/configtxgen -profile FiveOrgsOrdererGenesisKafka -channelID byfn-sys-channel -outputBlock ./channel-artifacts/genesis.block
+```../tools/configtxgen -profile FiveOrgsOrdererGenesisKafka -channelID byfn-sys-channel -outputBlock ./channel-artifacts/genesis.block```
 
 
 ## Create the channel transaction artifact
-export CHANNEL_NAME=mychannel  && ../tools/configtxgen -profile FiveOrgsChannel -outputCreateChannelTx ./channel-artifacts/channel.tx -channelID $CHANNEL_NAME
+```export CHANNEL_NAME=mychannel  && ../tools/configtxgen -profile FiveOrgsChannel -outputCreateChannelTx ./channel-artifacts/channel.tx -channelID $CHANNEL_NAME```
 
 
 ## Define the anchor peers
