@@ -1,0 +1,298 @@
+Organizations:
+    - &OrdererOrg
+        Name: OrdererOrg
+        ID: OrdererMSP
+        MSPDir: crypto-config/ordererOrganizations/medichain.com/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('OrdererMSP.admin')"
+    
+    - &Doctor
+        Name: DoctorMSP
+        ID: DoctorMSP
+        MSPDir: crypto-config/peerOrganizations/doctor.medichain.com/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('DoctorMSP.admin', 'DoctorMSP.peer', 'DoctorMSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('DoctorMSP.admin', 'DoctorMSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('DoctorMSP.admin')"
+        AnchorPeers:
+            - Host: peer0.doctor.medichain.com
+              Port: 7051
+
+    - &Hospital
+        Name: HospitalMSP
+        ID: HospitalMSP
+        MSPDir: crypto-config/peerOrganizations/hospital.medichain.com/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('HospitalMSP.admin', 'HospitalMSP.peer', 'HospitalMSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('HospitalMSP.admin', 'HospitalMSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('HospitalMSP.admin')"
+        AnchorPeers:
+            - Host: peer0.hospital.medichain.com
+              Port: 9051
+
+    - &Laboratory
+        Name: LaboratoryMSP
+        ID: LaboratoryMSP
+        MSPDir: crypto-config/peerOrganizations/laboratory.medichain.com/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('LaboratoryMSP.admin', 'LaboratoryMSP.peer', 'LaboratoryMSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('LaboratoryMSP.admin', 'LaboratoryMSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('LaboratoryMSP.admin')"
+        AnchorPeers:
+            - Host: peer0.laboratory.medichain.com
+              Port: 11051
+
+    - &Pharmacy
+        Name: PharmacyMSP
+        ID: PharmacyMSP
+        MSPDir: crypto-config/peerOrganizations/pharmacy.medichain.com/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('PharmacyMSP.admin', 'PharmacyMSP.peer', 'PharmacyMSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('PharmacyMSP.admin', 'PharmacyMSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('PharmacyMSP.admin')"
+        AnchorPeers:
+            - Host: peer0.pharmacy.medichain.com
+              Port: 13051
+    - &Healthinsurer
+        Name: HealthinsurerMSP
+        ID: HealthinsurerMSP
+        MSPDir: crypto-config/peerOrganizations/healthinsurer.medichain.com/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('HealthinsurerMSP.admin', 'HealthinsurerMSP.peer', 'HealthinsurerMSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('HealthinsurerMSP.admin', 'HealthinsurerMSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('HealthinsurerMSP.admin')"
+        AnchorPeers:
+            - Host: peer0.healthinsurer.medichain.com
+              Port: 15051
+
+
+Capabilities:
+    Channel: &ChannelCapabilities
+        V1_3: true
+    
+    Orderer: &OrdererCapabilities
+        V1_1: true
+    
+    Application: &ApplicationCapabilities
+        V1_3: true
+        V1_2: false
+        V1_1: false
+
+Application: &ApplicationDefaults
+    Organizations:
+    
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+
+    Capabilities:
+        <<: *ApplicationCapabilities
+
+Orderer: &OrdererDefaults
+    OrdererType: solo
+    
+    Addresses:
+        - orderer.medichain.com:7050
+    
+    BatchTimeout: 2s
+    
+    BatchSize:
+        MaxMessageCount: 10
+        AbsoluteMaxBytes: 99 MB
+        PreferredMaxBytes: 512 KB
+
+    Kafka:
+        Brokers:
+            - 127.0.0.1:9092
+    
+    Organizations:
+    
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+        BlockValidation:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+
+
+Channel: &ChannelDefaults
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+
+    Capabilities:
+        <<: *ChannelCapabilities
+
+Profiles:
+    FiveOrgsOrdererGenesis:
+        <<: *ChannelDefaults
+        Orderer:
+            <<: *OrdererDefaults
+            Organizations:
+                - *OrdererOrg
+            Capabilities:
+                <<: *OrdererCapabilities
+        Consortiums:
+            SampleConsortium:
+                Organizations:
+                    - *Doctor
+                    - *Hospital
+                    - *Laboratory
+                    - *Pharmacy
+                    - *Healthinsurer
+    
+    FiveOrgsChannel:
+        Consortium: SampleConsortium
+        <<: *ChannelDefaults
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *Doctor
+                - *Hospital
+                - *Laboratory
+                - *Pharmacy
+                - *Healthinsurer
+            Capabilities:
+                <<: *ApplicationCapabilities
+
+    FiveOrgsOrdererGenesisKafka:
+        <<: *ChannelDefaults
+        Capabilities:
+            <<: *ChannelCapabilities
+        Orderer:
+            <<: *OrdererDefaults
+            OrdererType: kafka
+            Kafka:
+                Brokers:
+                - kafka.medichain.com:9092
+
+            Organizations:
+            - *OrdererOrg
+            Capabilities:
+                <<: *OrdererCapabilities
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+            - <<: *OrdererOrg
+        Consortiums:
+            SampleConsortium:
+                Organizations:
+                - *Doctor
+                - *Hospital
+                - *Laboratory
+                - *Pharmacy
+                - *Healthinsurer
+    
+    SampleMultiNodeEtcdRaft:
+        <<: *ChannelDefaults
+        Capabilities:
+            <<: *ChannelCapabilities
+        Orderer:
+            <<: *OrdererDefaults
+            OrdererType: etcdraft
+            EtcdRaft:
+                Consenters:
+                - Host: orderer.medichain.com
+                  Port: 7050
+                  ClientTLSCert: crypto-config/ordererOrganizations/medichain.com/orderers/orderer.medichain.com/tls/server.crt
+                  ServerTLSCert: crypto-config/ordererOrganizations/medichain.com/orderers/orderer.medichain.com/tls/server.crt
+                - Host: orderer2.medichain.com
+                  Port: 7050
+                  ClientTLSCert: crypto-config/ordererOrganizations/medichain.com/orderers/orderer2.medichain.com/tls/server.crt
+                  ServerTLSCert: crypto-config/ordererOrganizations/medichain.com/orderers/orderer2.medichain.com/tls/server.crt
+                - Host: orderer3.medichain.com
+                  Port: 7050
+                  ClientTLSCert: crypto-config/ordererOrganizations/medichain.com/orderers/orderer3.medichain.com/tls/server.crt
+                  ServerTLSCert: crypto-config/ordererOrganizations/medichain.com/orderers/orderer3.medichain.com/tls/server.crt
+                - Host: orderer4.medichain.com
+                  Port: 7050
+                  ClientTLSCert: crypto-config/ordererOrganizations/medichain.com/orderers/orderer4.medichain.com/tls/server.crt
+                  ServerTLSCert: crypto-config/ordererOrganizations/medichain.com/orderers/orderer4.medichain.com/tls/server.crt
+                - Host: orderer5.medichain.com
+                  Port: 7050
+                  ClientTLSCert: crypto-config/ordererOrganizations/medichain.com/orderers/orderer5.medichain.com/tls/server.crt
+                  ServerTLSCert: crypto-config/ordererOrganizations/medichain.com/orderers/orderer5.medichain.com/tls/server.crt
+            Addresses:
+                - orderer.medichain.com:7050
+                - orderer2.medichain.com:7050
+                - orderer3.medichain.com:7050
+                - orderer4.medichain.com:7050
+                - orderer5.medichain.com:7050
+
+            Organizations:
+            - *OrdererOrg
+            Capabilities:
+                <<: *OrdererCapabilities
+        
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+            - <<: *OrdererOrg
+        
+        Consortiums:
+            SampleConsortium:
+                Organizations:
+                - *Doctor
+                - *Hospital
+                - *Laboratory
+                - *Pharmacy
+                - *Healthinsurer

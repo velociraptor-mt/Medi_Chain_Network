@@ -1,0 +1,148 @@
+version: '2'
+
+volumes:
+  orderer.medichain.com:
+  peer0.doctor.medichain.com:
+  peer1.doctor.medichain.com:
+  peer0.hospital.medichain.com:
+  peer1.hospital.medichain.com:
+  peer0.laboratory.medichain.com:
+  peer1.laboratory.medichain.com:
+  peer0.pharmacy.medichain.com:
+  peer1.pharmacy.medichain.com:
+  peer0.healthinsurer.medichain.com:
+  peer1.healthinsurer.medichain.com:
+
+networks:
+  byfn:
+
+services:
+
+  orderer.medichain.com:
+    extends:
+      file:   base/docker-compose-base.yaml
+      service: orderer.medichain.com
+    container_name: orderer.medichain.com
+    networks:
+      - byfn
+
+  peer0.doctor.medichain.com:
+    container_name: peer0.doctor.medichain.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer0.doctor.medichain.com
+    networks:
+      - byfn
+
+  peer1.doctor.medichain.com:
+    container_name: peer1.doctor.medichain.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer1.doctor.medichain.com
+    networks:
+      - byfn
+
+  peer0.hospital.medichain.com:
+    container_name: peer0.hospital.medichain.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer0.hospital.medichain.com
+    networks:
+      - byfn
+
+  peer1.hospital.medichain.com:
+    container_name: peer1.hospital.medichain.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer1.hospital.medichain.com
+    networks:
+      - byfn
+
+  peer0.laboratory.medichain.com:
+    container_name: peer0.laboratory.medichain.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer0.laboratory.medichain.com
+    networks:
+      - byfn
+
+  peer1.laboratory.medichain.com:
+    container_name: peer1.laboratory.medichain.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer1.laboratory.medichain.com
+    networks:
+      - byfn
+
+  peer0.pharmacy.medichain.com:
+    container_name: peer0.pharmacy.medichain.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer0.pharmacy.medichain.com
+    networks:
+      - byfn
+
+  peer1.pharmacy.medichain.com:
+    container_name: peer1.pharmacy.medichain.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer1.pharmacy.medichain.com
+    networks:
+      - byfn
+
+  peer0.healthinsurer.medichain.com:
+    container_name: peer0.healthinsurer.medichain.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer0.healthinsurer.medichain.com
+    networks:
+      - byfn
+
+  peer1.healthinsurer.medichain.com:
+    container_name: peer1.healthinsurer.medichain.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer1.healthinsurer.medichain.com
+    networks:
+      - byfn
+
+  cli:
+    container_name: cli
+    image: hyperledger/fabric-tools:$IMAGE_TAG
+    tty: true
+    stdin_open: true
+    environment:
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      #- FABRIC_LOGGING_SPEC=DEBUG
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_ID=cli
+      - CORE_PEER_ADDRESS=peer0.doctor.medichain.com:7051
+      - CORE_PEER_LOCALMSPID=DoctorMSP
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/doctor.medichain.com/peers/peer0.doctor.medichain.com/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/doctor.medichain.com/peers/peer0.doctor.medichain.com/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/doctor.medichain.com/peers/peer0.doctor.medichain.com/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/doctor.medichain.com/users/Admin@doctor.medichain.com/msp
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+        - /var/run/:/host/var/run/
+        - ./../chaincode/:/opt/gopath/src/github.com/chaincode
+        - ./crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+        - ./scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+        - ./channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+    depends_on:
+      - orderer.medichain.com
+      - peer0.doctor.medichain.com
+      - peer1.doctor.medichain.com
+      - peer0.hospital.medichain.com
+      - peer1.hospital.medichain.com
+      - peer0.laboratory.medichain.com
+      - peer1.laboratory.medichain.com
+      - peer0.pharmacy.medichain.com
+      - peer1.pharmacy.medichain.com
+      - peer0.healthinsurer.medichain.com
+      - peer1.healthinsurer.medichain.com
+    networks:
+      - byfn
